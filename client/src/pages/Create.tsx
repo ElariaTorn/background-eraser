@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Upload, X, Loader2, Wand2, Image as ImageIcon } from "lucide-react";
-import removeBackground from "@imgly/background-removal";
+import { removeBackground } from "@imgly/background-removal";
 import { useDropzone } from "react-dropzone";
 
 export default function Create() {
