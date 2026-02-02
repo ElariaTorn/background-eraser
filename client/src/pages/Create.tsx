@@ -70,6 +70,7 @@ export default function Create() {
       // 3. Remove Background (Client-side)
       // Note: This downloads models (~50MB) on first run.
       const blob = await removeBackground(file, {
+        publicPath: "https://static.img.ly/background-removal-data/1.7.0/dist/",
         progress: (key, current, total) => {
           const percent = Math.round((current / total) * 40); // 40% of total progress allocated to processing
           setProgress(40 + percent);
