@@ -81,7 +81,7 @@ export function useUpload(options: UseUploadOptions = {}) {
 
       return response.json();
     },
-    []
+    [],
   );
 
   /**
@@ -101,7 +101,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         throw new Error("Failed to upload file to storage");
       }
     },
-    []
+    [],
   );
 
   /**
@@ -137,7 +137,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         setIsUploading(false);
       }
     },
-    [requestUploadUrl, uploadToPresignedUrl, options]
+    [requestUploadUrl, uploadToPresignedUrl, options],
   );
 
   /**
@@ -155,7 +155,7 @@ export function useUpload(options: UseUploadOptions = {}) {
    */
   const getUploadParameters = useCallback(
     async (
-      file: UppyFile<Record<string, unknown>, Record<string, unknown>>
+      file: UppyFile<Record<string, unknown>, Record<string, unknown>>,
     ): Promise<{
       method: "PUT";
       url: string;
@@ -185,7 +185,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         headers: { "Content-Type": file.type || "application/octet-stream" },
       };
     },
-    []
+    [],
   );
 
   return {
@@ -196,4 +196,3 @@ export function useUpload(options: UseUploadOptions = {}) {
     progress,
   };
 }
-
