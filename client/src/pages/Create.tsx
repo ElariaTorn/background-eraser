@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { useCreateImage, useUpdateImage } from "@/hooks/use-images";
-import { useUpload } from "@/hooks/use-upload";
+
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
@@ -55,56 +54,58 @@ export default function Create() {
     return data.url;
   };
 
-  const processImage = async () => {
-    if (!file) return;
+const processImage = async () => {
+  if (!file) return;
 
-    try {
-      setIsProcessing(true);
-      setProgress(10);
+  try {
+    setIsProcessing(true);
+    setProgress(10);
 
-      // 1. Upload original
-      toast({ title: "Uploading...", description: "Uploading original image" });
-      const originalUrl = await uploadFile(file);
+    toast({
+      title: "Processing...",
+      description: "Removing background locally in your browser",
+    });
 
-      setProgress(40);
-      toast({ title: "Processing...", description: "Removing background..." });
+    const blob = await removeBackground(file, {
+      publicPath: "https://static.img.ly/background-removal-data/1.7.0/dist/",
+      device: "cpu",
+      progress: (key, current, total) => {
+        const percent = Math.round((current / total) * 90);
+        setProgress(10 + percent);
+      },
+    });
 
-      // 2. Remove background (client-side)
-      const blob = await removeBackground(file, {
-        publicPath: "https://static.img.ly/background-removal-data/1.7.0/dist/",
-        device: "cpu",
-        progress: (_key, current, total) => {
-          const percent = Math.round((current / total) * 40);
-          setProgress(40 + percent);
-        },
-      });
+    // создаём ссылку для скачивания
+    const url = URL.createObjectURL(blob);
 
-      const processedFile = new File([blob], "processed.png", {
-        type: "image/png",
-      });
+    // автоматически скачиваем файл
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `no-bg-${file.name.replace(/\.[^/.]+$/, "")}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-      setProgress(80);
-      toast({ title: "Saving...", description: "Uploading result" });
+    URL.revokeObjectURL(url);
 
-      // 3. Upload processed
-      const processedUrl = await uploadFile(processedFile);
+    setProgress(100);
+    toast({
+      title: "Done!",
+      description: "Background removed. PNG downloaded.",
+    });
+  } catch (error: any) {
+    console.error(error);
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: error?.message || "Failed to process image",
+    });
+  } finally {
+    setIsProcessing(false);
+    setProgress(0);
+  }
+};
 
-      setProgress(100);
-      toast({ title: "Success!", description: "Done 🎉" });
-
-      console.log({ originalUrl, processedUrl });
-    } catch (err: any) {
-      console.error(err);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: err.message || "Something went wrong",
-      });
-    } finally {
-      setIsProcessing(false);
-      setProgress(0);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
