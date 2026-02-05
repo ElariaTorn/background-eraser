@@ -67,7 +67,7 @@ const processImage = async () => {
     });
 
     const blob = await removeBackground(file, {
-      publicPath: "https://static.img.ly/background-removal-data/1.7.0/dist/",
+      publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.7.0/dist/",
       device: "cpu",
       progress: (key, current, total) => {
         const percent = Math.round((current / total) * 90);
