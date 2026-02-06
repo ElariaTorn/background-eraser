@@ -5,7 +5,6 @@ import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Upload, X, Loader2, Wand2, Image as ImageIcon } from "lucide-react";
-import { removeBackground } from "@imgly/background-removal";
 import { useDropzone } from "react-dropzone";
 
 export default function Create() {
@@ -54,57 +53,31 @@ export default function Create() {
     return data.url;
   };
 
-const processImage = async () => {
-  if (!file) return;
+async function processImage(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
 
-  try {
-    setIsProcessing(true);
-    setProgress(10);
+  const res = await fetch(
+    import.meta.env.VITE_BG_API_URL + "/remove-bg",
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
-    toast({
-      title: "Processing...",
-      description: "Removing background locally in your browser",
-    });
-
-    const blob = await removeBackground(file, {
-      publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.7.0/dist/",
-      device: "cpu",
-      progress: (key, current, total) => {
-        const percent = Math.round((current / total) * 90);
-        setProgress(10 + percent);
-      },
-    });
-
-    // создаём ссылку для скачивания
-    const url = URL.createObjectURL(blob);
-
-    // автоматически скачиваем файл
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `no-bg-${file.name.replace(/\.[^/.]+$/, "")}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-
-    setProgress(100);
-    toast({
-      title: "Done!",
-      description: "Background removed. PNG downloaded.",
-    });
-  } catch (error: any) {
-    console.error(error);
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: error?.message || "Failed to process image",
-    });
-  } finally {
-    setIsProcessing(false);
-    setProgress(0);
+  if (!res.ok) {
+    throw new Error("Background removal failed");
   }
-};
+
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+const url = await processImage(file);
+setResultImage(url);
+
+const [resultImage, setResultImage] = useState<string | null>(null);
+
 
 
   return (
