@@ -36,6 +36,32 @@ export default function Create() {
     setPreview(null);
   };
 
+const [resultImage, setResultImage] = useState<string | null>(null);
+
+const handleProcess = async () => {
+  if (!file) return;
+
+  try {
+    setIsProcessing(true);
+    setProgress(10);
+
+    const url = await processImage(file);
+
+    setResultImage(url);
+    setProgress(100);
+  } catch (err) {
+    console.error(err);
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: "Failed to remove background",
+    });
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+
   const uploadFile = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -53,7 +79,7 @@ export default function Create() {
     return data.url;
   };
 
-async function processImage(file: File) {
+async function processImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -73,10 +99,6 @@ async function processImage(file: File) {
   return URL.createObjectURL(blob);
 }
 
-const url = await processImage(file);
-setResultImage(url);
-
-const [resultImage, setResultImage] = useState<string | null>(null);
 
 
 
@@ -162,11 +184,11 @@ const [resultImage, setResultImage] = useState<string | null>(null);
             </div>
 
             <div className="mt-4 flex justify-end px-4 pb-4">
-              <button
-                onClick={processImage}
-                disabled={!file || isProcessing}
-                className="btn-primary w-full space-x-2 py-4 text-lg sm:w-auto sm:px-12"
-              >
+<button
+  onClick={handleProcess}
+  disabled={!file || isProcessing}
+  className="btn-primary w-full space-x-2 py-4 text-lg sm:w-auto sm:px-12"
+>
                 {isProcessing ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -179,6 +201,13 @@ const [resultImage, setResultImage] = useState<string | null>(null);
                   </>
                 )}
               </button>
+{resultImage && (
+  <img
+    src={resultImage}
+    alt="Result"
+    className="mt-4 max-h-[400px] object-contain"
+  />
+)}
             </div>
           </div>
 
