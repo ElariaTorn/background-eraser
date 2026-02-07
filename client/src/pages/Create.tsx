@@ -2,14 +2,12 @@ import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
 
 import { Navbar } from "@/components/Navbar";
-import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Upload, X, Loader2, Wand2, Image as ImageIcon } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
 export default function Create() {
   const [, setLocation] = useLocation();
-  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
