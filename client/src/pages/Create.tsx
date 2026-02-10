@@ -79,29 +79,42 @@ const handleProcess = async () => {
 
 
 
-import { removeBackground } from "@imgly/background-removal";
-
 async function processImage(file: File) {
   setIsProcessing(true);
-  setProgress(5);
+  setProgress(10);
 
-  const blob = await removeBackground(file, {
-    model: {
-      path: "/models/",
-      file: "model.onnx",
+  // ⬇️ динамический импорт (КЛЮЧЕВО)
+  const { removeBackground } = await import(
+    "@imgly/background-removal"
+  );
+
+  setProgress(30);
+
+  const result = await removeBackground(file, {
+    model: "u2netp",
+    output: {
+      format: "image/png",
     },
     progress: (key, current, total) => {
       if (total) {
-        setProgress(Math.round((current / total) * 100));
+        const percent = Math.min(
+          90,
+          Math.round((current / total) * 100)
+        );
+        setProgress(percent);
       }
     },
   });
 
+  setProgress(95);
+
+  const url = URL.createObjectURL(result);
   setProgress(100);
   setIsProcessing(false);
 
-  return URL.createObjectURL(blob);
+  return url;
 }
+
 
 
 
@@ -189,22 +202,22 @@ async function processImage(file: File) {
 
             <div className="mt-4 flex justify-end px-4 pb-4">
 <button
-  onClick={handleProcess}
+  onClick={async () => {
+    if (!file) return;
+    try {
+      const url = await processImage(file);
+      setResultImage(url);
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Background removal failed",
+        variant: "destructive",
+      });
+      setIsProcessing(false);
+    }
+  }}
   disabled={!file || isProcessing}
-  className="btn-primary w-full space-x-2 py-4 text-lg sm:w-auto sm:px-12"
 >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="h-5 w-5" />
-                    <span>Remove Background</span>
-                  </>
-                )}
-              </button>
 {resultImage && (
   <img
     src={resultImage}
