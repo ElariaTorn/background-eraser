@@ -77,23 +77,29 @@ const handleProcess = async () => {
     return data.url;
   };
 
-async function processImage(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
 
-  const res = await fetch(
-    import.meta.env.VITE_BG_API_URL + "/remove-bg",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
 
-  if (!res.ok) {
-    throw new Error("Background removal failed");
-  }
+import { removeBackground } from "@imgly/background-removal";
 
-  const blob = await res.blob();
+async function processImage(file: File) {
+  setIsProcessing(true);
+  setProgress(5);
+
+  const blob = await removeBackground(file, {
+    model: {
+      path: "/models/",
+      file: "model.onnx",
+    },
+    progress: (key, current, total) => {
+      if (total) {
+        setProgress(Math.round((current / total) * 100));
+      }
+    },
+  });
+
+  setProgress(100);
+  setIsProcessing(false);
+
   return URL.createObjectURL(blob);
 }
 
