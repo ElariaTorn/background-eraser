@@ -202,22 +202,22 @@ async function processImage(file: File) {
 
             <div className="mt-4 flex justify-end px-4 pb-4">
 <button
-  onClick={async () => {
-    if (!file) return;
-    try {
-      const url = await processImage(file);
-      setResultImage(url);
-    } catch (e) {
-      toast({
-        title: "Error",
-        description: "Background removal failed",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  }}
+  onClick={handleProcess}
   disabled={!file || isProcessing}
+  className="btn-primary w-full space-x-2 py-4 text-lg sm:w-auto sm:px-12"
 >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-5 w-5" />
+                    <span>Remove Background</span>
+                  </>
+                )}
+              </button>
 {resultImage && (
   <img
     src={resultImage}
