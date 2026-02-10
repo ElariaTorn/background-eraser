@@ -90,21 +90,21 @@ async function processImage(file: File) {
 
   setProgress(30);
 
-  const result = await removeBackground(file, {
-    model: "u2netp",
-    output: {
-      format: "image/png",
-    },
-    progress: (key, current, total) => {
-      if (total) {
-        const percent = Math.min(
-          90,
-          Math.round((current / total) * 100)
-        );
-        setProgress(percent);
-      }
-    },
-  });
+const result = await removeBackground(file, {
+  model: "isnet",
+  output: {
+    format: "image/png",
+  },
+  progress: (key, current, total) => {
+    if (total) {
+      const percent = Math.min(
+        90,
+        Math.round((current / total) * 100)
+      );
+      setProgress(percent);
+    }
+  },
+});
 
   setProgress(95);
 
