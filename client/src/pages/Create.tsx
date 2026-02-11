@@ -44,7 +44,29 @@ const handleProcess = async () => {
     setProgress(10);
 
     const url = await processImage(file);
+// vstavila novoe
+const fileName = `${tgUserId}_${Date.now()}.png`;
 
+await supabase.storage
+  .from("wardrobe")
+  .upload(fileName, blob);
+
+const { data } = supabase.storage
+  .from("wardrobe")
+  .getPublicUrl(fileName);
+
+await supabase.from("users").upsert({
+  id: tgUserId,
+  username: user?.username
+});
+
+
+await supabase.from("items").insert({
+  user_id: tgUserId,
+  image_url: data.publicUrl,
+});
+
+// prodolzhenie
     setResultImage(url);
     setProgress(100);
   } catch (err) {
