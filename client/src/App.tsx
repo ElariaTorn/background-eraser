@@ -2,6 +2,7 @@ import { Switch, Route } from "wouter";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Create from "@/pages/Create";
 import NotFound from "@/pages/not-found";
+import Admin from "@/pages/Admin";
 
 
 declare global {

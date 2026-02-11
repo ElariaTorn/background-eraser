@@ -12,6 +12,9 @@ export default function Create() {
   const [preview, setPreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+const tg = window.Telegram?.WebApp;
+const user = tg?.initDataUnsafe?.user;
+const tgUserId = user?.id;
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
