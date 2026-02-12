@@ -4,7 +4,6 @@ import { supabase } from "@/lib/supabase";
 export default function Admin() {
   const [items, setItems] = useState([]);
 
-
   useEffect(() => {
     supabase.from("items").select("*")
       .then(res => setItems(res.data || []));
